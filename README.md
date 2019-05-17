@@ -2,7 +2,7 @@
 Recursively Set-MailboxFolderPermission with a GUI for On-Premises Exchange 2013 environment
 
 ## How to Use
-Download script https://raw.githubusercontent.com/Tristanic1/Set-MailboxFolderPermissionsGUI/master/Set-MailboxFolderPermissionsGUI.ps1
+Download [script](https://github.com/Tristanic1/Set-MailboxFolderPermissionsGUI/archive/master.zip)
 
 Modify line 24 of "Set-MailboxFolderPermissionGUI.ps1" with your own Exchange Server name
 
@@ -33,14 +33,14 @@ Checking existing permissions on a mailbox for a specific user only:
 
 Remove user permissions from a mailbox:
 
-![Remvoe User Permissions](https://github.com/Tristanic1/Set-MailboxFolderPermissionsGUI/blob/master/img/Remove2.gif)
+![Remove User Permissions](https://github.com/Tristanic1/Set-MailboxFolderPermissionsGUI/blob/master/img/Remove2.gif)
 
 
 Add user permissions on a mailbox:
 
-![Add User Permissions](https://github.com/Tristanic1/Set-MailboxFolderPermissionsGUI/blob/master/img/Add2.gif)
+![Add Specific Folder Permissions](https://github.com/Tristanic1/Set-MailboxFolderPermissionsGUI/blob/master/img/Add2.gif)
 
-![Add Specific Folder Permissions](https://github.com/Tristanic1/Set-MailboxFolderPermissionsGUI/blob/master/img/Modify2.gif)
+![Add User Permissions](https://github.com/Tristanic1/Set-MailboxFolderPermissionsGUI/blob/master/img/Modify2.gif)
 
 
 ## Version history
