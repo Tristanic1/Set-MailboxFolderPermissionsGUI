@@ -4,9 +4,9 @@ Recursively Set-MailboxFolderPermission with a GUI for On-Premises Exchange 2013
 ## How to Use
 Download [script](https://github.com/Tristanic1/Set-MailboxFolderPermissionsGUI/archive/master.zip)
 
-Modify line 24 of "Set-MailboxFolderPermissionGUI.ps1" with your own Exchange Server name
+Modify line 24 of "Set-MailboxFolderPermissionGUI.ps1" with your own Exchange Server name.
 
-Can be run in normal user context, but then uncomment the Credential parts on lines 23 and s5
+Can be run in normal user context, but then uncomment the Credential parts on lines 23 and 25.
 
 ## Features
 1.	Check all existing permissions on the mailbox by just entering the mailbox name and pressing button “Check”.
