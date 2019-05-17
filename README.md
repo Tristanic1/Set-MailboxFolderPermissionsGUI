@@ -1,5 +1,5 @@
 # Set-MailboxFolderPermissionsGUI
-Recursively Set-MailboxFolderPermission with a GUI
+Recursively Set-MailboxFolderPermission with a GUI for On-Premises Exchange 2013 environment
 
 ## How to Use
 Download script https://raw.githubusercontent.com/Tristanic1/Set-MailboxFolderPermissionsGUI/master/Set-MailboxFolderPermissionsGUI.ps1
