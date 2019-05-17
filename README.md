@@ -50,4 +50,4 @@ Add user permissions on a mailbox:
 ## Known issues
 1.	Minimum requirement is PowerShell 3, but tested only with 5.1
 2.	Does not Overwrite the existing permissions (if user has “FolderVisible”, and you grant “Editor” – the “FolderVisible” stays). Workaround is to Remove all existing access rights and re-add them with new rights.
-
+3. You cannot remove legacy users, who no longer exist in AD
