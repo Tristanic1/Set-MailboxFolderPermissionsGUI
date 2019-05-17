@@ -11,14 +11,14 @@ Can be run in normal user context, but then uncomment the Credential parts on li
 # Features
 1.	Check all existing permissions on the mailbox by just entering the mailbox name and pressing button “Check”.
 This will show:
-  1. who has “Send on Behalf” permissions;
-  1. who has “Send as Mailbox” permissions;
-  1. who has “Full Access” to mailbox permission;
-  1. who has what kind of access rights to individual mailbox folders.
-1.	Check all existing permissions of one specific user on the mailbox;
-1.	Remove “User” access rights from the “Mailbox”;
-1.	By selecting “Add” you can either give some access to complete mailbox (all folders) or specific folder with subfolders; additionally you add “Send on Behalf” or “Send as Mailbox” permissions;
-1.	Pressing “SaveLog” log saves log to the same folder as the tool is currently located.
+    1. who has “Send on Behalf” permissions;
+    2. who has “Send as Mailbox” permissions;
+    3. who has “Full Access” to mailbox permission;
+    4. who has what kind of access rights to individual mailbox folders.
+2.	Check all existing permissions of one specific user on the mailbox;
+3.	Remove “User” access rights from the “Mailbox”;
+4.	By selecting “Add” you can either give some access to complete mailbox (all folders) or specific folder with subfolders; additionally you add “Send on Behalf” or “Send as Mailbox” permissions;
+5.	Pressing “SaveLog” log saves log to the same folder as the tool is currently located.
 
 # Screenshots
 Checking all existing permissions on a mailbox:
