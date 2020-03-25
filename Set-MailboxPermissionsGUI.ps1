@@ -469,7 +469,7 @@ function Get-MailboxFolderPermissions {
                 ForEach ($line in $fullmailboxpermissions){ 
                     
                     # Split the "DOMAIN\Username" into two substrings and select second one: "Username"
-                    $user = $line.RawIdentity.Split('\')[1]
+                    $user = $line.Split('\')[1]
                         
                     # Check if it's user, otherwise it's a group
                     if (Get-Mailbox $user) {
