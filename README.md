@@ -26,11 +26,9 @@ Checking all existing permissions on a mailbox:
 ![Check All Permissions](https://github.com/Tristanic1/Set-MailboxFolderPermissionsGUI/blob/master/img/Check.gif)
 
 
-
 Checking existing permissions on a mailbox for a specific user only:
 
 ![Check Single User Permissions](https://github.com/Tristanic1/Set-MailboxFolderPermissionsGUI/blob/master/img/CheckUser1.gif)
-
 
 
 Remove user permissions from a mailbox:
@@ -38,13 +36,11 @@ Remove user permissions from a mailbox:
 ![Remove User Permissions](https://github.com/Tristanic1/Set-MailboxFolderPermissionsGUI/blob/master/img/Remove1.gif)
 
 
-
 Add user permissions on a mailbox:
 
 ![Add Specific Folder Permissions](https://github.com/Tristanic1/Set-MailboxFolderPermissionsGUI/blob/master/img/Add1.gif)
 
 ![Add User Permissions](https://github.com/Tristanic1/Set-MailboxFolderPermissionsGUI/blob/master/img/Modify1.gif)
-
 
 ## Version history
 *    v0.1, 26/04/2019 - Initial version
