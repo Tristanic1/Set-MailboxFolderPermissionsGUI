@@ -45,8 +45,8 @@ Add user permissions on a mailbox:
 ## Version history
 *    v0.1, 26/04/2019 - Initial version
 *    v0.2, 02/05/2019 - Added dynamic resizing of form. Added possibility to save Log.
+*    v0.3, 15/07/2020 - Added possibility to view and edit "Default" and "Anonymous" permissions. Permissions on folders can be updated/overwriten.
 
 ## Known issues
 1.	Minimum requirement is PowerShell 3, but tested only with 5.1
-2.	Does not Overwrite the existing permissions (if user has “FolderVisible”, and you grant “Editor” – the “FolderVisible” stays). Workaround is to Remove all existing access rights and re-add them with new rights.
-3. You cannot remove legacy users, who no longer exist in AD
+2. You cannot remove legacy users, who no longer exist in AD
