@@ -15,6 +15,7 @@
     Change Log:
     V0.1, 26/04/2019 - Initial version
     V0.2, 02/05/2019 - Added dynamic resizing of form. Added possibility to save Log.
+    V0.3, 15/07/2020 - Added possibility to view and edit "Default" and "Anonymous" permissions. Permissions on folders can be updated/overwriten.
 #>
 
 Add-Type -AssemblyName System.Windows.Forms
@@ -23,7 +24,7 @@ Add-Type -AssemblyName System.Windows.Forms
 #$Credential = Get-Credential
 $ExchangeServer = 'YourExchangeServer'
 $Session = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri http://$ExchangeServer/PowerShell/ -Authentication Kerberos -AllowRedirection #-Credential $Credential
-Import-PSSession $Session -DisableNameChecking
+Import-PSSession $Session -DisableNameChecking -CommandName Get-Mailbox,Get-MailboxFolderPermission,Set-MailboxFolderPermission,Get-ADPermission,Add-ADPermission,Get-MailboxPermission,Add-MailboxPermission,Get-distributiongroup,Set-Mailbox,Set-MailboxPermission,Get-MailboxFolderStatistics -FormatTypeName *
 
 $ErrorActionPreference = 'SilentlyContinue'
 $WarningPreference = 'SilentlyContinue'
@@ -71,8 +72,9 @@ $MainTextBox.Font            = 'Consolas,11'
 $MainTextBox.Dock            = 'Fill'
 
 $MailboxGroupbox                 = New-Object system.Windows.Forms.Groupbox
-$MailboxGroupbox.height          = 100
+$MailboxGroupbox.height          = 110
 $MailboxGroupbox.width           = 150
+$MailboxGroupbox.text            = 'Mailbox to modify'
 $MailboxGroupbox.location        = New-Object System.Drawing.Point(1,1)
 $MailboxGroupbox.Dock            = 'Fill'
 
@@ -83,7 +85,7 @@ $ProgressBar.location           = New-Object System.Drawing.Point(1,1)
 $ProgressBar.Dock               = 'Fill'
 
 $AddRemoveGroupbox               = New-Object system.Windows.Forms.Groupbox
-$AddRemoveGroupbox.height        = 100
+$AddRemoveGroupbox.height        = 110
 $AddRemoveGroupbox.width         = 105
 $AddRemoveGroupbox.text          = 'Modification'
 $AddRemoveGroupbox.location      = New-Object System.Drawing.Point(1,1)
@@ -91,7 +93,7 @@ $AddRemoveGroupbox.Dock          = 'Fill'
 
 
 $FolderGroupbox                  = New-Object system.Windows.Forms.Groupbox
-$FolderGroupbox.height           = 100
+$FolderGroupbox.height           = 110
 $FolderGroupbox.width            = 274
 $FolderGroupbox.text             = 'Folder access rights to add'
 $FolderGroupbox.location         = New-Object System.Drawing.Point(1,1)
@@ -99,7 +101,7 @@ $FolderGroupbox.Enabled          = $false
 $FolderGroupbox.Dock             = 'Fill'
 
 $AccessRightsGroupbox            = New-Object system.Windows.Forms.Groupbox
-$AccessRightsGroupbox.height     = 100
+$AccessRightsGroupbox.height     = 110
 $AccessRightsGroupbox.width      = 150
 $AccessRightsGroupbox.text       = 'Access Rights'
 $AccessRightsGroupbox.location   = New-Object System.Drawing.Point(1,1)
@@ -113,46 +115,46 @@ $ButtonGroupbox.location      = New-Object System.Drawing.Point(1,1)
 $ButtonGroupbox.Anchor        = 'Top'
 $ButtonGroupbox.Dock          = 'Fill'
 
-$MailboxLabel                    = New-Object system.Windows.Forms.Label
-$MailboxLabel.text               = 'Mailbox to modify:'
-$MailboxLabel.AutoSize           = $true
-$MailboxLabel.width              = 25
-$MailboxLabel.height             = 10
-$MailboxLabel.location           = New-Object System.Drawing.Point(10,8)
-$MailboxLabel.Font               = 'Microsoft Sans Serif,8'
-
 $Username                        = New-Object system.Windows.Forms.Label
 $Username.text                   = 'User to add/remove:'
 $Username.AutoSize               = $true
 $Username.width                  = 25
 $Username.height                 = 10
-$Username.location               = New-Object System.Drawing.Point(10,53)
+$Username.location               = New-Object System.Drawing.Point(10,43)
 $Username.Font                   = 'Microsoft Sans Serif,8'
 
+$DefaultAnonymousCheckBox           = New-Object system.Windows.Forms.CheckBox
+$DefaultAnonymousCheckBox.text      = 'Show Default/Anonymous'
+$DefaultAnonymousCheckBox.AutoSize  = $true
+$DefaultAnonymousCheckBox.width     = 25
+$DefaultAnonymousCheckBox.height    = 8
+$DefaultAnonymousCheckBox.location  = New-Object System.Drawing.Point(10,85)
+$DefaultAnonymousCheckBox.Font      = 'Microsoft Sans Serif,7'
+$DefaultAnonymousCheckBox.Enabled   = $true
 
 $CheckButton                          = New-Object system.Windows.Forms.Button
 $CheckButton.text                     = 'Check'
-$CheckButton.width                    = 80
+$CheckButton.width                    = 88
 $CheckButton.height                   = 25
-$CheckButton.location                 = New-Object System.Drawing.Point(5,9)
+$CheckButton.location                 = New-Object System.Drawing.Point(5,10)
 $CheckButton.Font                     = 'Microsoft Sans Serif,10,style=Bold'
 $CheckButton.Enabled                  = $true
 $CheckButton.FlatStyle                = 'System'
 
 $ModifyButton                          = New-Object system.Windows.Forms.Button
 $ModifyButton.text                     = 'Modify'
-$ModifyButton.width                    = 80
+$ModifyButton.width                    = 88
 $ModifyButton.height                   = 25
-$ModifyButton.location                 = New-Object System.Drawing.Point(5,39)
+$ModifyButton.location                 = New-Object System.Drawing.Point(5,40)
 $ModifyButton.Font                     = 'Microsoft Sans Serif,10,style=Bold'
 $ModifyButton.Enabled                  = $false
 $ModifyButton.FlatStyle                = 'System'
 
 $SaveLogButton                          = New-Object system.Windows.Forms.Button
-$SaveLogButton.text                     = 'SaveLog'
-$SaveLogButton.width                    = 80
+$SaveLogButton.text                     = 'Save Log'
+$SaveLogButton.width                    = 88
 $SaveLogButton.height                   = 25
-$SaveLogButton.location                 = New-Object System.Drawing.Point(5,69)
+$SaveLogButton.location                 = New-Object System.Drawing.Point(5,70)
 $SaveLogButton.Font                     = 'Microsoft Sans Serif,10,style=Bold'
 $SaveLogButton.Enabled                  = $false
 $SaveLogButton.FlatStyle                = 'System'
@@ -161,7 +163,7 @@ $MailboxTextBox                  = New-Object system.Windows.Forms.TextBox
 $MailboxTextBox.multiline        = $false
 $MailboxTextBox.width            = 115
 $MailboxTextBox.height           = 20
-$MailboxTextBox.location         = New-Object System.Drawing.Point(10,25)
+$MailboxTextBox.location         = New-Object System.Drawing.Point(10,15)
 $MailboxTextBox.Font             = 'Microsoft Sans Serif,10'
 $MailboxTextBox.Text             = $null
 
@@ -169,7 +171,7 @@ $UserTextBox                     = New-Object system.Windows.Forms.TextBox
 $UserTextBox.multiline           = $false
 $UserTextBox.width               = 115
 $UserTextBox.height              = 20
-$UserTextBox.location            = New-Object System.Drawing.Point(10,70)
+$UserTextBox.location            = New-Object System.Drawing.Point(10,60)
 $UserTextBox.Font                = 'Microsoft Sans Serif,10'
 $UserTextBox.Text                = $null
 
@@ -297,7 +299,7 @@ $ToolTip1                        = New-Object system.Windows.Forms.ToolTip
 $ToolTip1.isBalloon              = $false
 $ToolTip1.SetToolTip($CheckButton,'Check what access rights user(-s) currently has(-ve) for the mailbox')
 
-$MailboxGroupbox.Controls.AddRange(@($MailboxLabel,$Username,$MailboxTextBox,$UserTextBox))
+$MailboxGroupbox.Controls.AddRange(@($Username,$MailboxTextBox,$UserTextBox,$DefaultAnonymousCheckBox))
 $AddRemoveGroupbox.Controls.AddRange(@($AddRadioButton,$ModifyButton,$RemoveRadioButton,$FullAccessRadioButton))
 $FolderGroupbox.Controls.AddRange(@($CompleteMailboxRadioButton,$SpecificFolderRadioButton,$SpecificFolderComboBox))
 $AccessRightsGroupbox.Controls.AddRange(@($AccessRightsComboBox,$SendOnBehalfRadioButton,$SendAsMailboxRadioButton))
@@ -374,7 +376,7 @@ function Test-User {
         $user = Get-mailbox -Identity $UserTextbox.Text
     } catch { }
     
-    if (($user) -or ((Get-distributiongroup $UserTextbox.Text).RecipientType -eq 'MailUniversalSecurityGroup') -or ($UserTextbox.TextLength -eq 0)) {
+    if (($user) -or ((Get-distributiongroup $UserTextbox.Text).RecipientType -eq 'MailUniversalSecurityGroup') -or ($UserTextbox.TextLength -eq 0) -or ($UserTextbox.Text -match '^Default$|^Anonym$|^Anonymous$|^Standard$')) {
         $ErrorProvider2.Clear()
     } else { 
         $ErrorProvider2.SetError($UserTextbox, 'Enter a valid username (Alias)')
@@ -484,7 +486,12 @@ function Get-MailboxFolderPermissions {
                 ForEach ($f in (Get-MailboxFolderStatistics $Mailbox)) {
                     $Progressbar.Increment(1)
                                 
-                    $FolderAccessRights = Get-MailboxFolderPermission -Identity "$mailbox`:$($f.FolderId)" | Where-Object {$_.User.DisplayName -ne 'Default' -and $_.User.DisplayName -ne 'Anonymous'}
+                    if ($DefaultAnonymousCheckBox.Checked -eq $true) {
+                        $FolderAccessRights = Get-MailboxFolderPermission -Identity "$mailbox`:$($f.FolderId)" 
+                    } else { 
+                        $FolderAccessRights = Get-MailboxFolderPermission -Identity "$mailbox`:$($f.FolderId)" | Where-Object {$_.User.DisplayName -ne 'Default' -and $_.User.DisplayName -ne 'Anonymous'}
+                    }
+
                                
                     ForEach ($entry in $FolderAccessRights) {
                         $username = $entry.user
@@ -499,7 +506,7 @@ function Get-MailboxFolderPermissions {
 
             } else {
                 # Check if User exists
-                if ((Get-mailbox -Identity $User) -or ((Get-distributiongroup $User).RecipientType -eq 'MailUniversalSecurityGroup')) {         
+                if ((Get-mailbox -Identity $User) -or ((Get-distributiongroup $User).RecipientType -eq 'MailUniversalSecurityGroup') -or ($User -match '^Default$|^Anonym$|^Anonymous$|^Standard$')) {         
                     
                     # Check if Mailbox and User are same
                     if ($Mailbox -eq $User) {                                               
@@ -509,18 +516,28 @@ function Get-MailboxFolderPermissions {
                                         
                          $MainTextBox.AppendText("[{0}] Checking the existing permissions for user $user on mailbox $mailbox..."-f (Get-Date -Format T)+$NewLine)
                      
-                         ForEach($f in (Get-MailboxFolderStatistics $Mailbox)) {
+                        ForEach($f in (Get-MailboxFolderStatistics $Mailbox)) {
                             $Progressbar.Increment(1)
-
-                            if (Get-MailboxFolderPermission "$mailbox`:$($f.FolderId)" -User $user) {
-                                
-                                $MainTextBox.AppendText("[{0}] $($f.FolderPath)" -f (Get-Date -Format T)+':        ')
-                                $output = Get-MailboxFolderPermission "$mailbox`:$($f.FolderId)" -User $user | Select-Object AccessRights -ExpandProperty AccessRights
-                                                                
-                                $MainTextBox.AppendText("$output"+$NewLine) 
+                            
+                            if ($DefaultAnonymousCheckBox.Checked -eq $true) {
+                                $FolderAccessRights = Get-MailboxFolderPermission -Identity "$mailbox`:$($f.FolderId)" 
+                            } else { 
+                                $FolderAccessRights = Get-MailboxFolderPermission -Identity "$mailbox`:$($f.FolderId)" | Where-Object {$_.User.DisplayName -ne 'Default' -and $_.User.DisplayName -ne 'Anonymous'}
                             }
-                        
-                         }
+                            
+                                                
+                            ForEach ($entry in $FolderAccessRights) {
+                                
+                                if ($user -match $entry.user) {
+                                    $username = $entry.user
+                                    $AccessRight = $entry.AccessRights
+                                
+                                    $MainTextBox.AppendText("[{0}] " -f (Get-Date -Format T))
+                                    $MainTextBox.AppendText("$($f.FolderPath)  -  "+"$username  -  "+"$AccessRight "+$NewLine)
+                                }
+                            }
+                        }
+                         
                     }
                 
                                 
@@ -562,7 +579,7 @@ function Set-MailboxFolderPermissions {
         $MailboxName = (Get-Mailbox $mailbox).Name
             
         # check if User or Group exists              
-        if (((Get-mailbox -Identity $User) -and !($Mailbox -eq $User)) -or ((Get-distributiongroup $User).RecipientType -eq 'MailUniversalSecurityGroup')) {   
+        if (((Get-mailbox -Identity $User) -and !($Mailbox -eq $User)) -or ((Get-distributiongroup $User).RecipientType -eq 'MailUniversalSecurityGroup') -or ($User -match '^Default$|^Anonym$|^Anonymous$|^Standard$')) {   
         
                 # Initialize Progress Bar
                 $Progressbar.Value = 0
@@ -633,7 +650,7 @@ function Set-MailboxFolderPermissions {
                             ForEach ($f in (Get-MailboxFolderStatistics $mailbox)) {
                                 $Progressbar.Increment(1)
 
-                                Add-MailboxFolderPermission "$mailbox`:$($f.FolderId)" -User $user -AccessRights $access
+                                Set-MailboxFolderPermission "$mailbox`:$($f.FolderId)" -User $user -AccessRights $access
                                 $MainTextBox.AppendText("[{0}] " -f (Get-Date -Format T))  
                                 $MainTextBox.AppendText("Adding $access access rights to folder $($f.FolderPath) to $user"+$NewLine)
                             }   
@@ -647,9 +664,9 @@ function Set-MailboxFolderPermissions {
                             $subfolders = $folder.Split('/')
                             $count = $folder.Split('/').count
 
-                            # For Calendar FolderVisible at the "/Top of Information Store" is not needed
-                            if ($folder -notmatch 'Calendar') {
-                                Add-MailboxFolderPermission $mailbox -User $user -AccessRights FolderVisible
+                            # For Calendar and /Top of Information Store this access right (FolderVisible) is not needed
+                            if ($folder -notmatch 'Calendar|Top of Inf') {
+                                Set-MailboxFolderPermission $mailbox -User $user -AccessRights FolderVisible
                                 $MainTextBox.AppendText("[{0}] Adding FolderVisible access rights to folder /Top of Information Store to $user"-f (Get-Date -Format T)+$NewLine)
                             }
                                                                                          
@@ -661,7 +678,7 @@ function Set-MailboxFolderPermissions {
                                 $path = $subfolders[$i].Replace([char]63743,'/')
                                 $fname = "$fname" +'\'+"$path"
                                                                     
-                                Add-MailboxFolderPermission $fname -User $user -AccessRights FolderVisible
+                                Set-MailboxFolderPermission $fname -User $user -AccessRights FolderVisible
                                 $output = $fname.Split(':')[1].Replace('\','/')
                                 
                                 # Has to be separate line, because there are Calendar folders like /Calendar/{091029301293...} and the -f Operator doesn't work properly
@@ -673,7 +690,7 @@ function Set-MailboxFolderPermissions {
                             ForEach ($f in (Get-MailboxFolderStatistics $mailbox | Where-Object { $_.FolderPath.Contains("$folder") -eq $True } ) ) {
                                 $Progressbar.Increment(1)
 
-                                Add-MailboxFolderPermission "$mailbox`:$($f.FolderId)" -User $user -AccessRights $access
+                                Set-MailboxFolderPermission "$mailbox`:$($f.FolderId)" -User $user -AccessRights $access
                                 $output = $($f.FolderPath).Replace([char]63743,'/')
                                     
                                 # Has to be separate line, because there are Calendar folders like /Calendar/{091029301293...} and the -f Operator doesn't work properly
