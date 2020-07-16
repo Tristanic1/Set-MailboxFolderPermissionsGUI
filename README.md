@@ -14,7 +14,10 @@ This will show:
     * who has “Send on Behalf” permissions;
     * who has “Send as Mailbox” permissions;
     * who has “Full Access” to mailbox permission;
-    * who has what kind of access rights to individual mailbox folders.
+    * who has what kind of access rights to individual mailbox folders;
+    * if checkbox "Show Default/Anonymous" is selected it will display those permissions.
+![Check Permissions](https://github.com/Tristanic1/Set-MailboxFolderPermissionsGUI/blob/master/img/Default_Anonymous.png)
+
 2.	Check all existing permissions of one specific user on the mailbox;
 3.	Remove “User” access rights from the “Mailbox”;
 4.	By selecting “Add” you can either give some access to complete mailbox (all folders) or specific folder with subfolders; additionally you add “Send on Behalf” or “Send as Mailbox” permissions;
