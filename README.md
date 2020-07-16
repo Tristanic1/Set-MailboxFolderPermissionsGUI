@@ -16,7 +16,7 @@ This will show:
     * who has “Full Access” to mailbox permission;
     * who has what kind of access rights to individual mailbox folders;
     * if checkbox "Show Default/Anonymous" is selected it will display those permissions.
-![Check Permissions](https://github.com/Tristanic1/Set-MailboxFolderPermissionsGUI/blob/master/img/Default_Anonymous.png)
+![Check Permissions](https://github.com/Tristanic1/Set-MailboxFolderPermissionsGUI/blob/master/img/Default_Anonymous.jpg)
 
 2.	Check all existing permissions of one specific user on the mailbox;
 3.	Remove “User” access rights from the “Mailbox”;
