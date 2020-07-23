@@ -13,9 +13,10 @@
     Written by: Tomas Cerniauskas
     
     Change Log:
-    V0.1, 26/04/2019 - Initial version
-    V0.2, 02/05/2019 - Added dynamic resizing of form. Added possibility to save Log.
-    V0.3, 15/07/2020 - Added possibility to view and edit "Default" and "Anonymous" permissions. Permissions on folders can be updated/overwriten.
+    V0.1, 26/04/2019  - Initial version
+    V0.2, 02/05/2019  - Added dynamic resizing of form. Added possibility to save Log.
+    V0.3, 15/07/2020  - Added possibility to view and edit "Default" and "Anonymous" permissions
+	v0.3.1 23/07/2020 - Fix for German "Default/Anonymous" permission check, Remove is working again
 #>
 
 Add-Type -AssemblyName System.Windows.Forms
@@ -24,7 +25,7 @@ Add-Type -AssemblyName System.Windows.Forms
 #$Credential = Get-Credential
 $ExchangeServer = 'YourExchangeServer'
 $Session = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri http://$ExchangeServer/PowerShell/ -Authentication Kerberos -AllowRedirection #-Credential $Credential
-Import-PSSession $Session -DisableNameChecking -CommandName Get-Mailbox,Get-MailboxFolderPermission,Set-MailboxFolderPermission,Get-ADPermission,Add-ADPermission,Get-MailboxPermission,Add-MailboxPermission,Get-distributiongroup,Set-Mailbox,Set-MailboxPermission,Get-MailboxFolderStatistics -FormatTypeName *
+Import-PSSession $Session -DisableNameChecking -CommandName Get-Mailbox,Get-MailboxFolderPermission,Set-Mailbox,Set-MailboxFolderPermission,Add-MailboxFolderPermission,Remove-MailboxFolderPermission,Get-ADPermission,Add-ADPermission,Remove-ADPermission,Remove-MailboxPermission,Get-MailboxPermission,Add-MailboxPermission,Get-distributiongroup,Set-Mailbox,Set-MailboxPermission,Get-MailboxFolderStatistics -FormatTypeName *
 
 $ErrorActionPreference = 'SilentlyContinue'
 $WarningPreference = 'SilentlyContinue'
@@ -458,7 +459,7 @@ function Get-MailboxFolderPermissions {
                     
                     # Check if it's user, otherwise it's a group
                     if (Get-Mailbox $user -erroraction SilentlyContinue) {
-                            $user = Get-Mailbox $user | Select-Object -ExpandProperty DisplayName
+                        $user = $(Get-Mailbox $user).name
                     }
     
                     $MainTextBox.AppendText("[{0}] Send as Mailbox Permission: $user" -f (Get-Date -Format T)+$NewLine)
@@ -474,8 +475,8 @@ function Get-MailboxFolderPermissions {
                     $user = $line.Split('\')[1]
                         
                     # Check if it's user, otherwise it's a group
-                    if (Get-Mailbox $user) {
-                            $user = Get-Mailbox $user | Select-Object -ExpandProperty DisplayName
+                    if (Get-Mailbox $user -erroraction SilentlyContinue) {
+                        $user = $(Get-Mailbox $user).name
                     }
     
                     $MainTextBox.AppendText("[{0}] Full Mailbox Permission: $user" -f (Get-Date -Format T)+$NewLine)
@@ -489,7 +490,7 @@ function Get-MailboxFolderPermissions {
                     if ($DefaultAnonymousCheckBox.Checked -eq $true) {
                         $FolderAccessRights = Get-MailboxFolderPermission -Identity "$mailbox`:$($f.FolderId)" 
                     } else { 
-                        $FolderAccessRights = Get-MailboxFolderPermission -Identity "$mailbox`:$($f.FolderId)" | Where-Object {$_.User.DisplayName -ne 'Default' -and $_.User.DisplayName -ne 'Anonymous'}
+                        $FolderAccessRights = Get-MailboxFolderPermission -Identity "$mailbox`:$($f.FolderId)" | Where-Object {$_.User.DisplayName -notmatch '^Default|^Anonym|^Standard'}
                     }
 
                                
@@ -506,7 +507,8 @@ function Get-MailboxFolderPermissions {
 
             } else {
                 # Check if User exists
-                if ((Get-mailbox -Identity $User) -or ((Get-distributiongroup $User).RecipientType -eq 'MailUniversalSecurityGroup') -or ($User -match '^Default$|^Anonym$|^Anonymous$|^Standard$')) {         
+                $usercheck = Get-mailbox -Identity $User
+                if (($usercheck) -or ((Get-distributiongroup $User).RecipientType -eq 'MailUniversalSecurityGroup') -or ($User -match '^Default$|^Anonym$|^Anonymous$|^Standard$')) {         
                     
                     # Check if Mailbox and User are same
                     if ($Mailbox -eq $User) {                                               
@@ -522,13 +524,13 @@ function Get-MailboxFolderPermissions {
                             if ($DefaultAnonymousCheckBox.Checked -eq $true) {
                                 $FolderAccessRights = Get-MailboxFolderPermission -Identity "$mailbox`:$($f.FolderId)" 
                             } else { 
-                                $FolderAccessRights = Get-MailboxFolderPermission -Identity "$mailbox`:$($f.FolderId)" | Where-Object {$_.User.DisplayName -ne 'Default' -and $_.User.DisplayName -ne 'Anonymous'}
+                                $FolderAccessRights = Get-MailboxFolderPermission -Identity "$mailbox`:$($f.FolderId)" | Where-Object {$_.User.DisplayName -notmatch 'Default|Anonym|Standard'}
                             }
                             
                                                 
                             ForEach ($entry in $FolderAccessRights) {
                                 
-                                if ($user -match $entry.user) {
+                                if ($usercheck.name -eq $entry.user) {
                                     $username = $entry.user
                                     $AccessRight = $entry.AccessRights
                                 
@@ -565,6 +567,7 @@ function Set-MailboxFolderPermissions {
     $user = $UserTextBox.Text
     $folder = $SpecificFolderComboBox.Text
     $access = $AccessRightsComboBox.Text
+    $usercheck = Get-mailbox -Identity $User
     
     $ModifyButton.Enabled  = $false   
     $CheckButton.Enabled   = $false
@@ -579,7 +582,7 @@ function Set-MailboxFolderPermissions {
         $MailboxName = (Get-Mailbox $mailbox).Name
             
         # check if User or Group exists              
-        if (((Get-mailbox -Identity $User) -and !($Mailbox -eq $User)) -or ((Get-distributiongroup $User).RecipientType -eq 'MailUniversalSecurityGroup') -or ($User -match '^Default$|^Anonym$|^Anonymous$|^Standard$')) {   
+        if ((($usercheck) -and !($Mailbox -eq $User)) -or ((Get-distributiongroup $User).RecipientType -eq 'MailUniversalSecurityGroup') -or ($User -match '^Default$|^Anonym$|^Anonymous$|^Standard$')) {   
         
                 # Initialize Progress Bar
                 $Progressbar.Value = 0
@@ -627,7 +630,7 @@ function Set-MailboxFolderPermissions {
                     ForEach($f in (Get-MailboxFolderStatistics $Mailbox)) {
                         $Progressbar.Increment(1)
                             
-                        Remove-MailboxFolderPermission "$mailbox`:$($f.FolderId)" -User $user -Confirm:$False
+                        Remove-MailboxFolderPermission "$mailbox`:$($f.FolderId)" -User $User -Confirm:$False
                             
                         # Has to be separate line, because there are Calendar folders like /Calendar/{091029301293...} and the -f Operator doesn't work properly
                         $MainTextBox.AppendText("[{0}] " -f (Get-Date -Format T))
@@ -650,7 +653,12 @@ function Set-MailboxFolderPermissions {
                             ForEach ($f in (Get-MailboxFolderStatistics $mailbox)) {
                                 $Progressbar.Increment(1)
 
-                                Set-MailboxFolderPermission "$mailbox`:$($f.FolderId)" -User $user -AccessRights $access
+                                Add-MailboxFolderPermission "$mailbox`:$($f.FolderId)" -User $user -AccessRights $access
+                                
+                                # if existing permission entry already exists - use Set command instead
+                                if (!($?)) {
+                                    Set-MailboxFolderPermission "$mailbox`:$($f.FolderId)" -User $user -AccessRights $access
+                                }
                                 $MainTextBox.AppendText("[{0}] " -f (Get-Date -Format T))  
                                 $MainTextBox.AppendText("Adding $access access rights to folder $($f.FolderPath) to $user"+$NewLine)
                             }   
@@ -666,7 +674,13 @@ function Set-MailboxFolderPermissions {
 
                             # For Calendar and /Top of Information Store this access right (FolderVisible) is not needed
                             if ($folder -notmatch 'Calendar|Top of Inf') {
-                                Set-MailboxFolderPermission $mailbox -User $user -AccessRights FolderVisible
+                                Add-MailboxFolderPermission $mailbox -User $user -AccessRights FolderVisible
+
+                                # if existing permission entry already exists - use Set command instead
+                                if (!($?)) {
+                                    Set-MailboxFolderPermission $mailbox -User $user -AccessRights FolderVisible
+                                }
+                                
                                 $MainTextBox.AppendText("[{0}] Adding FolderVisible access rights to folder /Top of Information Store to $user"-f (Get-Date -Format T)+$NewLine)
                             }
                                                                                          
@@ -677,8 +691,13 @@ function Set-MailboxFolderPermissions {
     
                                 $path = $subfolders[$i].Replace([char]63743,'/')
                                 $fname = "$fname" +'\'+"$path"
-                                                                    
-                                Set-MailboxFolderPermission $fname -User $user -AccessRights FolderVisible
+                                
+                                Add-MailboxFolderPermission $fname -User $user -AccessRights FolderVisible
+                                # if existing permission entry already exists - use Set command instead
+                                if (!($?)) {
+                                    Set-MailboxFolderPermission $fname -User $user -AccessRights FolderVisible
+                                }
+                                
                                 $output = $fname.Split(':')[1].Replace('\','/')
                                 
                                 # Has to be separate line, because there are Calendar folders like /Calendar/{091029301293...} and the -f Operator doesn't work properly
@@ -690,7 +709,11 @@ function Set-MailboxFolderPermissions {
                             ForEach ($f in (Get-MailboxFolderStatistics $mailbox | Where-Object { $_.FolderPath.Contains("$folder") -eq $True } ) ) {
                                 $Progressbar.Increment(1)
 
-                                Set-MailboxFolderPermission "$mailbox`:$($f.FolderId)" -User $user -AccessRights $access
+                                Add-MailboxFolderPermission "$mailbox`:$($f.FolderId)" -User $user -AccessRights $access
+                                # if existing permission entry already exists - use Set command instead
+                                if (!($?)) {
+                                    Set-MailboxFolderPermission "$mailbox`:$($f.FolderId)" -User $user -AccessRights $access
+                                }
                                 $output = $($f.FolderPath).Replace([char]63743,'/')
                                     
                                 # Has to be separate line, because there are Calendar folders like /Calendar/{091029301293...} and the -f Operator doesn't work properly
